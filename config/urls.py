@@ -23,3 +23,4 @@ urlpatterns = [
     path('bode/',include('bodegaApp.urls')),
     path('',home)
 ]
+

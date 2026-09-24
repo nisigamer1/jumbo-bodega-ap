@@ -1,20 +1,81 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>django - bodega</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 </head>
+
 <body>
-    <h1>bienvenido a bodega</h1>
-    <ul>
-        <li>nombre:{{nombre}}</li>
-        <li>apellidos:{{apellidos}}</li>
-        {% if cargo == "bodeguero" %}
-        <li>cargo:{{cargo}} </li>
-        {% else %}
-        <li>cargo: no informado  </li>
-        {% endif %}
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'productos'%}">productos</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            otros
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'ahora'%}">hoy</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+        </div>
+        <div class="row">
+            <div class="col"></div>
+            <div class="card" style="width: 18rem;">
+                <img src="{% static 'images/USUARIO.PNG' %}" class="card-img-top" 
+                    alt="foto de {{nombre}} {{apellidos}}">
+                <div class="card-body">
+                <h5 class={{nombre}} {{apellidos}}>Card title</h5>
+                <p class="card-text">
+                    <ul>
+                    <li>nombre:{{nombre}}</li>
+                    <li>apellidos:{{apellidos}}</li>
+                    {% if cargo == "bodeguero" %}
+                    <li>cargo:{{cargo}} </li>
+                    {% else %}
+                    <li>cargo: no informado  </li>
+                    {% endif %}
     </ul>
+                </p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <h1>bienvenido a bodega</h1>
+    
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>
