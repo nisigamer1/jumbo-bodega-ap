@@ -1,31 +1,17 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-import datetime
-
-# Create your views here.
-def inventario(request):
-    return render(request,'inventario/inicio.html')
+from datetime import datetime
+from .models import Producto
 
 def inicio(request):
-#variable que muestra la url de inicio de la pagina y su contenico  que contiene una variable salida que tiene lenguaje html
+    return render(request, 'inventario/main.html')
 
-    salida =''' 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>mi terrible de dejango</title>
-</head>
-<body>
-<h1>bienvenidos a mi terrible sitio</h1>   
-</body>
-</html>'''
-    return HttpResponse(salida)
+def inventario(request):
+    query = request.GET.get('q', '')
+    if query:
+        productos = Producto.objects.filter(nombre__icontains=query) | Producto.objects.filter(codigo_barras__icontains=query)
+    else:
+        productos = Producto.objects.all()
+    return render(request, 'inventario/main.html', {'productos': productos, 'query': query})
 
 def ahora(request):
-    fecha = datetime.datetime.now()
-    salida = f"<h2>en la tienda  hoy es <b>{fecha}</b></h2>"
-    return HttpResponse(salida)
-def home(request):
-    return HttpResponse("<h1>pagina inicial del proyecto</h1>")
+    return render(request, 'inventario/ahora.html', {'fecha_actual': datetime.now()})

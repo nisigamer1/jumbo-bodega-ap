@@ -1,0 +1,70 @@
+{% extends 'bodega/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="fa-solid fa-boxes-packing text-success"></i> Control de Inventario Bodega AP vs Sala</h2>
+    <!-- Botón Agregar Producto -->
+    <a href="/admin/inventarioapp/producto/add/" class="btn btn-jumbo shadow-sm" target="_blank">
+        <i class="fa-solid fa-box-archive me-1"></i> Agregar Producto
+    </a>
+</div>
+
+<!-- Buscador de Productos -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-md-9">
+                <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Buscar producto por Nombre o Código EAN/SKU...">
+            </div>
+            <div class="col-md-3 d-grid">
+                <button type="submit" class="btn btn-dark">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i> Buscar Producto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tarjetas de Productos -->
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for prod in productos %}
+    <div class="col">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-3">
+                <span class="badge bg-success mb-1">{{ prod.categoria.nombre }}</span>
+                <h5 class="card-title fw-bold text-dark">{{ prod.nombre }}</h5>
+                <small class="text-muted">EAN: {{ prod.codigo_barras }}</small>
+            </div>
+            <div class="card-body">
+                <p class="fs-4 fw-bold text-success mb-2">${{ prod.precio }}</p>
+                <div class="d-flex justify-content-between border-top pt-2">
+                    <small>Stock Bodega AP:</small>
+                    <span class="fw-bold">{{ prod.stock_bodega }} un.</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <small>Stock Sala Ventas:</small>
+                    <span class="fw-bold">{{ prod.stock_sala }} un.</span>
+                </div>
+                <div class="d-flex justify-content-between border-top mt-2 pt-2 fw-bold text-dark">
+                    <span>Stock Total:</span>
+                    <span class="badge bg-dark fs-6">{{ prod.stock_total }}</span>
+                </div>
+            </div>
+            <div class="card-footer bg-light border-0 d-flex justify-content-between">
+                <a href="/admin/inventarioapp/producto/{{ prod.id }}/change/" class="btn btn-sm btn-outline-primary" target="_blank">
+                    <i class="fa-solid fa-pen-to-square"></i> Modificar
+                </a>
+                <a href="/admin/inventarioapp/producto/{{ prod.id }}/delete/" class="btn btn-sm btn-outline-danger" target="_blank">
+                    <i class="fa-solid fa-trash"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+        <i class="fa-solid fa-box-open fs-1 mb-2"></i>
+        <p>No hay productos registrados en el inventario o la búsqueda no arrojó resultados.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

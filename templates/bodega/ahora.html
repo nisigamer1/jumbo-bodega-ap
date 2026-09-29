@@ -1,0 +1,43 @@
+{% extends 'bodega/base.html' %}
+
+{% block title %}Hora Servidor - Jumbo{% endblock %}
+
+{% block contenido %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0 text-center">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fa-solid fa-clock me-2"></i>Fecha y Hora del Servidor
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-2">Sincronizado con el sistema de Bodega Jumbo</p>
+                    
+                    <h1 class="display-4 fw-bold text-primary my-3">
+                        {{ fecha_actual|date:"H:i:s" }}
+                    </h1>
+                    
+                    <p class="fs-5 text-dark fw-semibold mb-1">
+                        {{ fecha_actual|date:"l, d \d\e F \d\e Y" }}
+                    </p>
+                    
+                    <span class="badge bg-info text-dark mt-2">
+                        Zona horaria: {{ fecha_actual|date:"T" }}
+                    </span>
+
+                    <hr class="my-4">
+
+                    <a href="{% url 'bodega_ahora' %}" class="btn btn-outline-success">
+                        <i class="fa-solid fa-rotate-right me-1"></i> Actualizar Hora
+                    </a>
+                </div>
+                <div class="card-footer text-muted">
+                    INACAP La Serena | Evaluación Sumativa N°2
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

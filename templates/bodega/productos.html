@@ -1,0 +1,177 @@
+{% extends 'bodega/base.html' %}
+{% load static %}
+
+{% block title %}Inventario Bodega y Sala - Jumbo{% endblock %}
+
+{% block contenido %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fa-solid fa-boxes-stacked me-2 text-success"></i>Inventario Bodega & Sala AP</h2>
+        <!-- BOTÓN AGREGAR (Abre en Django Admin) -->
+        <a href="/admin/" target="_blank" class="btn btn-success fw-bold">
+            <i class="fa-solid fa-plus me-1"></i> Agregar Producto
+        </a>
+    </div>
+
+    <!-- Indicadores -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase mb-1">Stock Sala</h6>
+                    <h3 class="fw-bold mb-0">{{ total_sala }} un.</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase mb-1">Stock Bodega AP</h6>
+                    <h3 class="fw-bold mb-0">{{ total_bodega }} un.</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase mb-1">Total Ítems</h6>
+                    <h3 class="fw-bold mb-0">{{ total_items }} Productos</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULARIO BUSCAR -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{% url 'bodega_productos' %}" class="row g-2">
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" name="q" class="form-control" placeholder="Buscar por Nombre, Código EAN o Categoría..." value="{{ query }}">
+                    </div>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-success w-100 fw-bold">
+                        <i class="fa-solid fa-search me-1"></i> Buscar
+                    </button>
+                    {% if query %}
+                    <a href="{% url 'bodega_productos' %}" class="btn btn-outline-secondary" title="Limpiar Búsqueda">
+                        <i class="fa-solid fa-xmark"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TABLA DE PRODUCTOS -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Código SKU</th>
+                            <th>Producto</th>
+                            <th>Categoría / Pasillo</th>
+                            <th>Precio</th>
+                            <th>Bodega</th>
+                            <th>Sala</th>
+                            <th>Total</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in productos %}
+                        <tr>
+                            <td class="fw-bold text-secondary">{{ prod.codigo_barras }}</td>
+                            <td class="fw-semibold">{{ prod.nombre }}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ prod.categoria.nombre }} (Pasillo {{ prod.categoria.pasillo }})
+                                </span>
+                            </td>
+                            <td class="text-success fw-bold">${{ prod.precio }}</td>
+                            <td>{{ prod.stock_bodega }}</td>
+                            <td>{{ prod.stock_sala }}</td>
+                            <td class="fw-bold">{{ prod.stock_total }}</td>
+                            
+                            <!-- BOTONES INTERACTIVOS (SIMULACIÓN VISUAL) -->
+                            <td class="text-center">
+                                <button type="button" class="btn btn-sm btn-outline-warning me-1" data-bs-toggle="modal" data-bs-target="#modalModificar{{ prod.id }}">
+                                    <i class="fa-solid fa-pen-to-square"></i> Modificar
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ prod.id }}">
+                                    <i class="fa-solid fa-trash"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- MODAL EDITAR (DEMO) -->
+                        <div class="modal fade" id="modalModificar{{ prod.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-warning text-dark">
+                                        <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2"></i>Modificar Producto</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form onsubmit="return false;">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Nombre del Producto</label>
+                                                <input type="text" class="form-control" value="{{ prod.nombre }}">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-bold">Precio ($)</label>
+                                                    <input type="number" class="form-control" value="{{ prod.precio }}">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-bold">Stock Bodega</label>
+                                                    <input type="number" class="form-control" value="{{ prod.stock_bodega }}">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-warning fw-bold" data-bs-dismiss="modal">Guardar Cambios (Demo)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MODAL ELIMINAR (DEMO) -->
+                        <div class="modal fade" id="modalEliminar{{ prod.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title"><i class="fa-solid fa-triangle-exclamation me-2"></i>Confirmar Eliminación</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="mb-0">¿Está seguro de eliminar el producto <strong>{{ prod.nombre }}</strong> (SKU: {{ prod.codigo_barras }})?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Eliminar (Demo)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                No se encontraron productos registrados.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
