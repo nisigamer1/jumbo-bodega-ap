@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Catálogo de Productos | Jumbo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-boxes-stacked me-2"></i>Catálogo de Productos</span>
+            <!-- Asegúrate de que 'dashboard' sea el name de la url de tu panel universal -->
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-sm"><i class="fa-solid fa-arrow-left me-2"></i>Volver al Panel</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for producto in productos %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <!-- Mostramos si está en oferta -->
+                        {% if producto.en_oferta %}
+                            <span class="badge bg-danger mb-2">¡Oferta Jumbo!</span>
+                        {% endif %}
+                        
+                        <h5 class="card-title fw-bold" style="color: #008539;">{{ producto.nombre }}</h5>
+                        <p class="card-text text-muted mb-1"><small>Código: {{ producto.codigo_barras }}</small></p>
+                        <p class="card-text text-muted mb-3"><small>Categoría: {{ producto.categoria.nombre }} (Pasillo {{ producto.categoria.pasillo }})</small></p>
+                        
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="fs-5 fw-bold text-dark">${{ producto.precio }}</span>
+                        </div>
+                        
+                        <!-- Desglose de Stock usando los campos de tu modelo -->
+                        <div class="bg-light p-2 rounded border">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Stock en Sala:</span>
+                                <span class="fw-bold">{{ producto.stock_sala }} un.</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>Stock Bodega AP:</span>
+                                <span class="fw-bold">{{ producto.stock_bodega }} un.</span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-success">
+                                <span><strong>Stock Total:</strong></span>
+                                <span><strong>{{ producto.stock_total }} un.</strong></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    Aún no hay productos registrados en el sistema.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from inventarioapp import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('usuarios.urls')),          
     path('bodega/', include('bodegaApp.urls')),  
     path('inventario/', include('inventarioapp.urls')),
+    path('catalogo/', views.catalogo_productos, name='catalogo'),
 ]

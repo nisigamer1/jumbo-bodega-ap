@@ -21,4 +21,7 @@ urlpatterns = [
     path('', views.inicio, name="inicio_inventario"),
     path('inventario/', views.inventario, name="inventario"),
     path('ahora/', views.ahora, name="inventario_ahora"),
+    path('catalogo/', views.catalogo_productos, name='catalogo'),
+    path('mantenedor-productos/', views.mantenedor_productos, name='mantenedor_productos'),
+    path('eliminar-producto/<int:id>/', views.eliminar_producto, name='eliminar_producto'),
 ]
