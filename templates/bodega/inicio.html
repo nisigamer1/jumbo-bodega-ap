@@ -1,113 +1,42 @@
 {% extends 'bodega/base.html' %}
 
-{% block title %}Inicio - Jumbo Bodega & Sala AP{% endblock %}
+{% block title %}Inicio | Portal Jumbo{% endblock %}
 
 {% block contenido %}
-<div class="row justify-content-center my-4">
-    <div class="col-lg-10">
-        
-        <!-- Tarjeta de Reseña Cencosud -->
-        <div class="card shadow-sm border-0 rounded-3 mb-4">
-            <div class="card-header card-header-jumbo text-center py-3 fs-4">
-                <i class="fa-solid fa-store me-2"></i> Bienvenidos a la Plataforma de Gestión Jumbo AP
-            </div>
-            <div class="card-body p-4 p-md-5">
-                
-                <div class="text-center mb-4">
-                    <span class="badge bg-warning text-dark fs-6 px-3 py-2 mb-2">Cencosud & Colaboradores</span>
-                    <h2 class="fw-bold text-dark">Comprometidos con la excelencia operativa</h2>
-                </div>
+<div class="container my-4">
+    <!-- Banner de Bienvenida -->
+    <div class="card bg-success text-white text-center py-4 mb-4 shadow-sm border-0">
+        <div class="card-body">
+            <h2 class="fw-bold mb-0"><i class="fa-solid fa-store me-2"></i>Bienvenidos a la Plataforma de Gestión Jumbo AP</h2>
+        </div>
+    </div>
 
-                <div class="fs-5 text-secondary text-center px-md-4 mb-4" style="line-height: 1.7;">
-                    <p>
-                        En conjunto con <strong>Cencosud</strong> y nuestros colaboradores, buscamos brindar la mejor experiencia a nuestros clientes. Con este propósito creamos estas apps para poder facilitar el acceso y flexibilidad de nuestro trabajo.
-                    </p>
-                </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center my-3">
+            <span class="badge bg-warning text-dark px-3 py-2 fw-bold fs-6 mb-2">Cencosud & Colaboradores</span>
+            <h3 class="fw-bold text-dark">Comprometidos con la excelencia operativa</h3>
+            <p class="text-muted">
+                En conjunto con <strong>Cencosud</strong> y nuestros colaboradores, buscamos brindar la mejor experiencia a nuestros clientes. Consulta aquí el catálogo de productos disponibles en sala y bodega.
+            </p>
+        </div>
+    </div>
 
-                <hr class="my-4">
-
-                <!-- Accesos Directos -->
-                <div class="row g-3 text-center">
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between">
-                            <div>
-                                <i class="fa-solid fa-users text-success fs-1 mb-2"></i>
-                                <h5 class="fw-bold">Gestión de Personal</h5>
-                                <p class="text-muted small">Consulta el equipo de trabajo en turno, sus cargos y departamentos asignados.</p>
-                            </div>
-                            <a href="{% url 'empleados' %}" class="btn btn-jumbo w-100 mt-2">
-                                <i class="fa-solid fa-arrow-right me-1"></i> Ver Trabajadores
-                            </a>
-                        </div>
+    <!-- Módulo de Inventario (Solo Visualización Pública) -->
+    <div class="row justify-content-center mt-3">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm text-center h-100">
+                <div class="card-body p-4">
+                    <div class="display-4 text-success mb-3">
+                        <i class="fa-solid fa-boxes-stacked"></i>
                     </div>
-
-                    <div class="col-md-6">
-                        <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between">
-                            <div>
-                                <i class="fa-solid fa-boxes-stacked text-success fs-1 mb-2"></i>
-                                <h5 class="fw-bold">Inventario Bodega / Sala</h5>
-                                <p class="text-muted small">Revisa el catálogo de productos, precios y disponibilidad en pasillos.</p>
-                            </div>
-                            <a href="{% url 'bodega_productos' %}" class="btn btn-jumbo w-100 mt-2">
-                                <i class="fa-solid fa-arrow-right me-1"></i> Ver Inventario
-                            </a>
-                        </div>
-                    </div>
+                    <h4 class="fw-bold">Inventario Bodega / Sala</h4>
+                    <p class="text-muted">Revisa el catálogo de productos, precios y disponibilidad en pasillos de la tienda.</p>
+                    <a href="{% url 'bodega_productos' %}" class="btn btn-success w-100 fw-bold py-2">
+                        <i class="fa-solid fa-arrow-right me-2"></i>Ver Inventario
+                    </a>
                 </div>
-
             </div>
         </div>
-
-        <!-- Tabla de Personal Activo en Turno -->
-        <div class="card shadow-sm border-0 rounded-3">
-            <div class="card-header card-header-jumbo py-3">
-                <h5 class="mb-0">
-                    <i class="fa-solid fa-user-check me-2"></i>Personal Activo en Turno
-                </h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>RUT</th>
-                                <th>Nombre Completo</th>
-                                <th>Cargo</th>
-                                <th>Área</th>
-                                <th>Turno</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    {% for emp in trabajadores %}
-                                    <tr>
-                                        <td class="fw-bold text-secondary">{{ emp.rut }}</td>
-                                        <!-- AQUÍ SE LLAMA A LA PROPIEDAD DE MODELS.PY -->
-                                        <td class="fw-semibold">{{ emp.nombres }} {{ emp.apellidos }}</td>
-                                        <td>{{ emp.cargo }}</td>
-                                        <td>
-                                            <span class="badge bg-light text-dark border">
-                                                {{ emp.departamento.nombre }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success">
-                                                {{ emp.get_turno_display }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">
-                                            No hay trabajadores activos registrados en este momento.
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                                </table>
-                                </div>
-                                </div>
-                                </div>
-                                
-                                </div>
-                                </div>
-                                {% endblock %}
+    </div>
+</div>
+{% endblock %}

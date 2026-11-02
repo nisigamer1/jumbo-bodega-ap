@@ -1,30 +1,15 @@
 from django.shortcuts import render
 from datetime import datetime
 from django.db.models import Q, Sum
+from django.contrib.auth.models import User  # <-- Importación agregada
 from .models import Empleado, Producto
 
 def inicio(request):
-    # Consulta los trabajadores activos para mostrarlos en la página de inicio
-    trabajadores = Empleado.objects.filter(activo=True).select_related('departamento')
-    return render(request, 'bodega/inicio.html', {'trabajadores': trabajadores})
+    return render(request, 'bodega/inicio.html')
 
 def empleados(request):
-    query = request.GET.get('q', '').strip()
-    if query:
-        empleados_list = Empleado.objects.filter(
-            Q(nombres__icontains=query) | 
-            Q(apellidos__icontains=query) | 
-            Q(rut__icontains=query) |
-            Q(cargo__icontains=query) |
-            Q(departamento__nombre__icontains=query)
-        ).select_related('departamento')
-    else:
-        empleados_list = Empleado.objects.all().select_related('departamento')
-        
-    return render(request, 'bodega/empleados.html', {
-        'empleados': empleados_list, 
-        'query': query
-    })
+    trabajadores = User.objects.select_related('perfilempleado').all()
+    return render(request, 'bodega/empleados.html', {'trabajadores': trabajadores})
 
 def productos(request):
     query = request.GET.get('q', '').strip()
@@ -37,7 +22,6 @@ def productos(request):
     else:
         productos_list = Producto.objects.all().select_related('categoria')
 
-    # Totales para los contadores superiores
     total_sala = productos_list.aggregate(total=Sum('stock_sala'))['total'] or 0
     total_bodega = productos_list.aggregate(total=Sum('stock_bodega'))['total'] or 0
     total_items = productos_list.count()

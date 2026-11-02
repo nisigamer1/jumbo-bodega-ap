@@ -34,7 +34,9 @@
                 <span id="reloj" class="reloj-digital me-4 fw-bold">00:00:00</span>
                 
                 <span class="text-white me-3">Usuario: {{ request.user.username|title }}</span>
-                <a href="{% url 'logout' %}" class="btn btn-danger btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a>
+                <a href="{% url 'salir' %}" class="btn btn-danger btn-sm m-0">
+    <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+</a>
             </div>
         </div>
     </nav>

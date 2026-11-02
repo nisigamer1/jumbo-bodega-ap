@@ -35,7 +35,6 @@
 </head>
 <body class="d-flex align-items-center justify-content-center vh-100">
 
-    <!-- SweetAlert2 para errores de inicio de sesión -->
     {% if form.errors or messages %}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -51,10 +50,9 @@
 
     <div class="card shadow-lg border-0" style="width: 25rem; border-radius: 15px;">
         <div class="card-header text-center bg-jumbo text-white" style="border-top-left-radius: 15px; border-top-right-radius: 15px; padding: 25px;">
-            <!-- Logo Jumbo -->
-            <img src="{% static 'images/USUARIO.png' %}" alt="Jumbo Logo" width="130" class="mb-2 img-fluid">
+            <i class="fa-solid fa-user-circle fa-4x mb-2"></i>
             <h4 class="mb-0 fw-bold">Portal Jumbo</h4>
-            <small class="text-white-50">Acceso a Gestión y Mantenedores</small>
+            <small class="text-white-50">Acceso Sistema de Gestión</small>
         </div>
         
         <div class="card-body p-4 text-dark">
@@ -75,14 +73,17 @@
             </form>
             
             <div class="text-center mt-3">
-                <a href="{% url 'password_reset' %}" class="text-decoration-none text-muted small fw-bold">
+                <a href="#" class="text-decoration-none text-muted small fw-bold">
                     <i class="fa-solid fa-circle-question me-1"></i>¿Olvidaste tu contraseña?
                 </a>
             </div>
             
-            <div class="text-center mt-3 border-top pt-2">
-                <a href="{% url 'home_bodega' %}" class="text-success small fw-semibold text-decoration-none">
-                    <i class="fa-solid fa-arrow-left me-1"></i>Volver al Menú Principal
+            <!-- Opción para ir al menú principal si lo necesitas -->
+            <div class="text-center mt-3 border-top pt-3">
+<!-- Cambia el href del botón para que quede exactamente así -->
+<a href="{% url 'home_bodega' %}" class="btn btn-outline-success w-100">
+    <i class="fa-solid fa-house me-1"></i> Ir al Sitio Público
+</a>
                 </a>
             </div>
         </div>

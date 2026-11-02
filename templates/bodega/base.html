@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,7 +19,6 @@
         .btn-jumbo { background-color: var(--jumbo-green); color: white; }
         .btn-jumbo:hover { background-color: var(--jumbo-dark); color: white; }
         .navbar-brand-jumbo { font-weight: 800; font-size: 1.5rem; letter-spacing: 1px; color: white !important; }
-        .card-header-jumbo { background-color: var(--jumbo-green); color: white; font-weight: bold; }
     </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
@@ -37,47 +37,44 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
-                    <!-- Vínculo a Empleados -->
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold" href="{% url 'empleados' %}">
-                            <i class="fa-solid fa-users me-1"></i> Trabajadores Jumbo
-                        </a>
-                    </li>
-
-                    <!-- Vínculo a Productos -->
-                    <li class="nav-item">
-                        <a class="nav-link text-white fw-semibold" href="{% url 'bodega_productos' %}">
-                            <i class="fa-solid fa-boxes-stacked me-1"></i> Inventario Bodega/Sala
-                        </a>
-                    </li>
-
-                    <!-- Vínculo a Fecha Actual -->
+                    <!-- Vínculo a Hora Servidor -->
                     <li class="nav-item">
                         <a class="nav-link text-white fw-semibold" href="{% url 'bodega_ahora' %}">
                             <i class="fa-solid fa-clock me-1"></i> Hora Servidor
                         </a>
                     </li>
 
-                    <!-- Admin -->
-<li class="nav-item ms-lg-2">
-    <a class="nav-link bg-warning text-dark fw-bold rounded px-3" href="{% url 'dashboard' %}">
-        <i class="fa-solid fa-user-gear me-1"></i> Iniciar Sesión / Perfil
-    </a>
-</li>
-                        </a>
-                    </li>
+                    <!-- Botón Iniciar Sesión -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link bg-primary text-white fw-bold rounded px-3 shadow-sm" href="{% url 'dashboard' %}">
+                                <i class="fa-solid fa-user me-1"></i> {{ user.username }}
+                            </a>
+                        </li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link bg-danger text-white fw-bold rounded px-3 shadow-sm" href="{% url 'logout' %}">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i> Salir
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link bg-warning text-dark fw-bold rounded px-3 shadow-sm" href="{% url 'login' %}">
+                                <i class="fa-solid fa-right-to-bracket me-1"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Contenido Principal Dinámico -->
+    <!-- Contenido Principal -->
     <main class="container my-4 flex-grow-1">
         {% block contenido %}
         {% endblock %}
     </main>
 
-    <!-- Pie de página con bibliografía e información académica -->
+    <!-- Footer -->
     <footer class="text-center py-3 bg-white border-top mt-auto">
         <div class="container">
             <p class="text-muted mb-0 fw-semibold">

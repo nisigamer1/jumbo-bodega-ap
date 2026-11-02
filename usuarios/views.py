@@ -8,18 +8,13 @@ from django.http import JsonResponse
 from django.utils import timezone
 import datetime
 
-
 from .models import Asistencia, PerfilEmpleado
 from usuarios.forms import EditarUsuarioForm, CrearUsuarioForm
 
-from .models import Asistencia, PerfilEmpleado
 
-
-
-@login_required
+@login_required(login_url='login')
 def editar_usuario(request, user_id):
     usuario = get_object_or_404(User, id=user_id)
-    # Obtenemos o creamos el perfil para manipular el sueldo
     perfil, created = PerfilEmpleado.objects.get_or_create(usuario=usuario)
     
     if request.method == 'POST':
@@ -49,6 +44,7 @@ def editar_usuario(request, user_id):
         )
         
     return render(request, 'usuarios/editar_usuario.html', {'form': form, 'usuario': usuario})
+
 
 @login_required
 def mantenedor_usuarios(request):
@@ -89,6 +85,7 @@ def mantenedor_usuarios(request):
         'form_crear': form_crear
     })
 
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -104,13 +101,17 @@ def login_view(request):
 
     return render(request, 'usuarios/login.html', {'form': form})
 
+
 def logout_view(request):
     logout(request)
     return redirect('login')
 
+
 @login_required(login_url='login')
 def dashboard_view(request):
+    # Asegúrate de que el nombre aquí sea EXACTAMENTE el mismo de tu archivo nuevo
     return render(request, 'usuarios/dashboard_admin.html')
+
 
 @login_required(login_url='login')
 def marcar_asistencia(request):
