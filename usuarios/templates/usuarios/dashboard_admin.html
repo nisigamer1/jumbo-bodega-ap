@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Administrador</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Panel de Administrador</span>
+            <span class="text-white">Usuario: {{ request.user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Cerrar Sesión</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h2>Bienvenido al Sistema</h2>
+        <p>Tienes acceso total a los mantenedores y transacciones.</p>
+        <hr>
+        <!-- Aquí conectaremos los botones hacia tus apps de bodega e inventario -->
+    </div>
+</body>
+</html>
