@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from usuarios import views
 
 urlpatterns = [
     # Esta es la línea clave que falta para que lea el inicio vacio ('')
@@ -9,4 +10,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('marcar-asistencia/', views.marcar_asistencia, name='marcar_asistencia'),
+    path('mantenedor-usuarios/', views.mantenedor_usuarios, name='mantenedor_usuarios'),
 ]

@@ -1,15 +1,52 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.utils import timezone
 import datetime
-from .models import Asistencia
+from .models import Asistencia, PerfilEmpleado
 
+@login_required
+def mantenedor_usuarios(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        grupo_nombre = request.POST.get('grupo')
+        sueldo = request.POST.get('sueldo', 0)
+
+        # 1. Crear el usuario base de Django
+        nuevo_usuario = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # 2. Asignarle el Grupo
+        try:
+            grupo = Group.objects.get(name=grupo_nombre)
+            nuevo_usuario.groups.add(grupo)
+        except Group.DoesNotExist:
+            pass 
+
+        # 3. Crear perfil con sueldo
+        PerfilEmpleado.objects.create(
+            usuario=nuevo_usuario,
+            sueldo=sueldo
+        )
+        return redirect('mantenedor_usuarios')
+
+    usuarios = User.objects.select_related('perfil').all()
+    grupos = Group.objects.all()
+    
+    return render(request, 'usuarios/mantenedor_usuarios.html', {
+        'usuarios': usuarios,
+        'grupos': grupos
+    })
 
 def login_view(request):
-    # Si ya está logueado, lo manda al dashboard
     if request.user.is_authenticated:
         return redirect('dashboard')
 
@@ -23,6 +60,7 @@ def login_view(request):
         form = AuthenticationForm()
 
     return render(request, 'usuarios/login.html', {'form': form})
+
 def logout_view(request):
     logout(request)
     return redirect('login')
@@ -31,7 +69,6 @@ def logout_view(request):
 def dashboard_view(request):
     return render(request, 'usuarios/dashboard_admin.html')
 
-# 2. VISTA DE ASISTENCIA
 @login_required(login_url='login')
 def marcar_asistencia(request):
     if request.method == 'POST':
