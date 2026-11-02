@@ -16,8 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from usuarios import views
-from inventarioapp import views
+from inventarioapp import views # <-- Este es tu import actual de inventario (déjalo si lo usas)
+from usuarios import views as usuarios_views # <-- AGREGA ESTA LÍNEA
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +25,6 @@ urlpatterns = [
     path('bodega/', include('bodegaApp.urls')),  
     path('inventario/', include('inventarioapp.urls')),
     path('catalogo/', views.catalogo_productos, name='catalogo'),
-    path('mantenedor-usuarios/', views.mantenedor_usuarios, name='mantenedor_usuarios'),
+    path('mantenedor-usuarios/', usuarios_views.mantenedor_usuarios, name='mantenedor_usuarios'),
 ]
+
