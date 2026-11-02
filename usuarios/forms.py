@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User, Group
+from django.core.exceptions import ValidationError
 
 class CrearUsuarioForm(forms.Form):
     username = forms.CharField(
@@ -22,8 +23,16 @@ class CrearUsuarioForm(forms.Form):
     sueldo = forms.IntegerField(
         label="Sueldo Base ($)",
         initial=0,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'required': 'required'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'required': 'required', 'min': '0'})
     )
+
+    # Validación para que el sueldo no sea negativo al crear
+    def clean_sueldo(self):
+        sueldo = self.cleaned_data.get('sueldo')
+        if sueldo is not None and sueldo < 0:
+            raise ValidationError("El sueldo no puede ser un valor negativo.")
+        return sueldo
+
 
 class EditarUsuarioForm(forms.ModelForm):
     grupo = forms.ModelChoiceField(
@@ -34,7 +43,7 @@ class EditarUsuarioForm(forms.ModelForm):
     )
     sueldo_base = forms.IntegerField(
         required=False, 
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'min': '0'})
     )
 
     class Meta:
@@ -45,10 +54,9 @@ class EditarUsuarioForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
-    class Meta:
-        model = User
-        fields = ['username', 'email']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-        }
+    # Validación para que el sueldo base no sea negativo al editar
+    def clean_sueldo_base(self):
+        sueldo_base = self.cleaned_data.get('sueldo_base')
+        if sueldo_base is not None and sueldo_base < 0:
+            raise ValidationError("El sueldo base no puede ser un valor negativo.")
+        return sueldo_base

@@ -14,17 +14,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+"""
+URL configuration for config project.
+"""
+"""
+URL configuration for config project.
+"""
 from django.contrib import admin
 from django.urls import path, include
-from inventarioapp import views # <-- Este es tu import actual de inventario (déjalo si lo usas)
-from usuarios import views as usuarios_views # <-- AGREGA ESTA LÍNEA
 
 urlpatterns = [
+    # Panel de administración de Django
     path('admin/', admin.site.urls),
-    path('', include('usuarios.urls')),          
-    path('bodega/', include('bodegaApp.urls')),  
+    
+    # Rutas nativas de autenticación de Django (password_reset, etc.)
+    path('accounts/', include('django.contrib.auth.urls')),
+    
+    # Rutas de Usuarios (Login, Dashboard, Mantenedor de Usuarios en la raíz)
+    path('', include('usuarios.urls')),
+    
+    # Rutas de la app Bodega (Menú principal y vistas)
+    path('', include('bodegaApp.urls')),
+    
+    # Rutas de la app Inventario (Productos CRUD)
     path('inventario/', include('inventarioapp.urls')),
-    path('catalogo/', views.catalogo_productos, name='catalogo'),
-    path('mantenedor-usuarios/', usuarios_views.mantenedor_usuarios, name='mantenedor_usuarios'),
 ]
 
