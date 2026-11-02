@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
@@ -6,44 +7,86 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.utils import timezone
 import datetime
+
+
 from .models import Asistencia, PerfilEmpleado
+from usuarios.forms import EditarUsuarioForm, CrearUsuarioForm
+
+from .models import Asistencia, PerfilEmpleado
+
+
+
+@login_required
+def editar_usuario(request, user_id):
+    usuario = get_object_or_404(User, id=user_id)
+    # Obtenemos o creamos el perfil para manipular el sueldo
+    perfil, created = PerfilEmpleado.objects.get_or_create(usuario=usuario)
+    
+    if request.method == 'POST':
+        form = EditarUsuarioForm(request.POST, instance=usuario)
+        if form.is_valid():
+            user = form.save()
+            
+            # 1. Guardar Grupo
+            grupo = form.cleaned_data.get('grupo')
+            user.groups.clear()
+            if grupo:
+                user.groups.add(grupo)
+                
+            # 2. Guardar Sueldo en el Perfil
+            nuevo_sueldo = form.cleaned_data.get('sueldo_base')
+            if nuevo_sueldo is not None:
+                perfil.sueldo = nuevo_sueldo
+                perfil.save()
+            
+            messages.success(request, f'Usuario {user.username} actualizado correctamente.')
+            return redirect('mantenedor_usuarios')
+    else:
+        grupo_actual = usuario.groups.first()
+        form = EditarUsuarioForm(
+            instance=usuario, 
+            initial={'grupo': grupo_actual, 'sueldo_base': perfil.sueldo}
+        )
+        
+    return render(request, 'usuarios/editar_usuario.html', {'form': form, 'usuario': usuario})
 
 @login_required
 def mantenedor_usuarios(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        grupo_nombre = request.POST.get('grupo')
-        sueldo = request.POST.get('sueldo', 0)
+        form_crear = CrearUsuarioForm(request.POST)
+        if form_crear.is_valid():
+            username = form_crear.cleaned_data['username']
+            email = form_crear.cleaned_data['email']
+            password = form_crear.cleaned_data['password']
+            grupo = form_crear.cleaned_data['grupo']
+            sueldo = form_crear.cleaned_data['sueldo']
 
-        # 1. Crear el usuario base de Django
-        nuevo_usuario = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
+            # 1. Crear el usuario base de Django
+            nuevo_usuario = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
 
-        # 2. Asignarle el Grupo
-        try:
-            grupo = Group.objects.get(name=grupo_nombre)
-            nuevo_usuario.groups.add(grupo)
-        except Group.DoesNotExist:
-            pass 
+            # 2. Asignarle el Grupo seleccionable
+            if grupo:
+                nuevo_usuario.groups.add(grupo)
 
-        # 3. Crear perfil con sueldo
-        PerfilEmpleado.objects.create(
-            usuario=nuevo_usuario,
-            sueldo=sueldo
-        )
-        return redirect('mantenedor_usuarios')
+            # 3. Crear perfil con sueldo
+            PerfilEmpleado.objects.create(
+                usuario=nuevo_usuario,
+                sueldo=sueldo
+            )
+            messages.success(request, f'Usuario {username} creado con éxito.')
+            return redirect('mantenedor_usuarios')
+    else:
+        form_crear = CrearUsuarioForm()
 
     usuarios = User.objects.select_related('perfil').all()
-    grupos = Group.objects.all()
     
     return render(request, 'usuarios/mantenedor_usuarios.html', {
         'usuarios': usuarios,
-        'grupos': grupos
+        'form_crear': form_crear
     })
 
 def login_view(request):
