@@ -37,27 +37,26 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for u in usuarios %}
+                        {% for item in usuarios %}
                         <tr>
-                            <td class="fw-bold">{{ u.username }}</td>
-                            <td>{{ u.email }}</td>
+                            <td class="fw-bold">{{ item.user.username }}</td>
+                            <td>{{ item.user.email }}</td>
                             <td>
-                                {% for group in u.groups.all %}
+                                {% for group in item.user.groups.all %}
                                     <span class="badge bg-secondary">{{ group.name }}</span>
                                 {% empty %}
                                     <span class="text-muted small">Sin grupo asignado</span>
                                 {% endfor %}
                             </td>
-                            <td>
-                                {% if u.perfil %}
-                                    ${{ u.perfil.sueldo }}
-                                {% else %}
-                                    <span class="text-muted small">Sin perfil creado</span>
-                                {% endif %}
+                            <td class="fw-semibold text-success">
+                                ${{ item.sueldo }}
                             </td>
                             <td class="text-center">
-                                <a href="{% url 'editar_usuario' u.id %}" class="btn btn-warning btn-sm fw-bold text-dark">
+                                <a href="{% url 'editar_usuario' item.user.id %}" class="btn btn-warning btn-sm fw-bold text-dark me-1">
                                     <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                </a>
+                                <a href="{% url 'eliminar_usuario' item.user.id %}" class="btn btn-danger btn-sm fw-bold" onclick="return confirm('¿Estás seguro de eliminar al usuario {{ item.user.username }}?');">
+                                    <i class="fa-solid fa-trash me-1"></i> Eliminar
                                 </a>
                             </td>
                         </tr>
@@ -83,6 +82,11 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
+                        {% if form_crear.errors %}
+                            <div class="alert alert-danger py-2 small">
+                                {{ form_crear.errors }}
+                            </div>
+                        {% endif %}
                         <div class="mb-3">
                             <label class="form-label">Nombre de Usuario</label>
                             {{ form_crear.username }}

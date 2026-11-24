@@ -12,14 +12,44 @@ from .models import Asistencia, PerfilEmpleado
 from usuarios.forms import EditarUsuarioForm, CrearUsuarioForm
 
 
+def _obtener_o_crear_perfil(user):
+    """Obtiene o crea el perfil sin importar si la FK se llama 'user' o 'usuario'."""
+    if hasattr(PerfilEmpleado, 'user'):
+        perfil, _ = PerfilEmpleado.objects.get_or_create(user=user)
+    else:
+        perfil, _ = PerfilEmpleado.objects.get_or_create(usuario=user)
+    return perfil
+
+
+def _asignar_sueldo(perfil, monto):
+    """Asigna el sueldo sin importar si el campo es 'sueldo_base' o 'sueldo'."""
+    if monto is None:
+        return
+    if hasattr(perfil, 'sueldo_base'):
+        perfil.sueldo_base = monto
+    elif hasattr(perfil, 'sueldo'):
+        perfil.sueldo = monto
+    perfil.save()
+
+
+def _leer_sueldo(perfil):
+    """Lee el sueldo de forma segura."""
+    return getattr(perfil, 'sueldo_base', getattr(perfil, 'sueldo', 0))
+
+
 @login_required(login_url='login')
 def editar_usuario(request, user_id):
     usuario = get_object_or_404(User, id=user_id)
-    perfil, created = PerfilEmpleado.objects.get_or_create(usuario=usuario)
+    perfil = _obtener_o_crear_perfil(usuario)
     
     if request.method == 'POST':
         form = EditarUsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
+            nuevo_sueldo = form.cleaned_data.get('sueldo_base')
+            if nuevo_sueldo is not None and nuevo_sueldo < 0:
+                messages.error(request, 'El sueldo base no puede ser negativo.')
+                return render(request, 'usuarios/editar_usuario.html', {'form': form, 'usuario': usuario})
+
             user = form.save()
             
             # 1. Guardar Grupo
@@ -29,10 +59,8 @@ def editar_usuario(request, user_id):
                 user.groups.add(grupo)
                 
             # 2. Guardar Sueldo en el Perfil
-            nuevo_sueldo = form.cleaned_data.get('sueldo_base')
             if nuevo_sueldo is not None:
-                perfil.sueldo = nuevo_sueldo
-                perfil.save()
+                _asignar_sueldo(perfil, nuevo_sueldo)
             
             messages.success(request, f'Usuario {user.username} actualizado correctamente.')
             return redirect('mantenedor_usuarios')
@@ -40,7 +68,7 @@ def editar_usuario(request, user_id):
         grupo_actual = usuario.groups.first()
         form = EditarUsuarioForm(
             instance=usuario, 
-            initial={'grupo': grupo_actual, 'sueldo_base': perfil.sueldo}
+            initial={'grupo': grupo_actual, 'sueldo_base': _leer_sueldo(perfil)}
         )
         
     return render(request, 'usuarios/editar_usuario.html', {'form': form, 'usuario': usuario})
@@ -51,37 +79,48 @@ def mantenedor_usuarios(request):
     if request.method == 'POST':
         form_crear = CrearUsuarioForm(request.POST)
         if form_crear.is_valid():
-            username = form_crear.cleaned_data['username']
-            email = form_crear.cleaned_data['email']
-            password = form_crear.cleaned_data['password']
-            grupo = form_crear.cleaned_data['grupo']
-            sueldo = form_crear.cleaned_data['sueldo']
+            sueldo = form_crear.cleaned_data.get('sueldo') or 0
+            if sueldo < 0:
+                messages.error(request, 'El sueldo base no puede ser negativo.')
+            else:
+                username = form_crear.cleaned_data['username']
+                email = form_crear.cleaned_data['email']
+                password = form_crear.cleaned_data['password']
+                grupo = form_crear.cleaned_data['grupo']
 
-            # 1. Crear el usuario base de Django
-            nuevo_usuario = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password
-            )
+                # 1. Crear el usuario base de Django
+                nuevo_usuario = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password
+                )
 
-            # 2. Asignarle el Grupo seleccionable
-            if grupo:
-                nuevo_usuario.groups.add(grupo)
+                # 2. Asignarle el Grupo seleccionable
+                if grupo:
+                    nuevo_usuario.groups.add(grupo)
 
-            # 3. Crear perfil con sueldo
-            PerfilEmpleado.objects.create(
-                usuario=nuevo_usuario,
-                sueldo=sueldo
-            )
-            messages.success(request, f'Usuario {username} creado con éxito.')
-            return redirect('mantenedor_usuarios')
+                # 3. Crear perfil y asignar sueldo sin fallar
+                perfil = _obtener_o_crear_perfil(nuevo_usuario)
+                _asignar_sueldo(perfil, sueldo)
+
+                messages.success(request, f'Usuario {username} creado con éxito.')
+                return redirect('mantenedor_usuarios')
+        else:
+            messages.error(request, 'Revisa los datos ingresados. Puede que el usuario ya exista.')
     else:
         form_crear = CrearUsuarioForm()
 
-    usuarios = User.objects.select_related('perfil').all()
+    usuarios = User.objects.all()
+    lista_usuarios = []
+    for u in usuarios:
+        p = _obtener_o_crear_perfil(u)
+        lista_usuarios.append({
+            'user': u,
+            'sueldo': _leer_sueldo(p)
+        })
     
     return render(request, 'usuarios/mantenedor_usuarios.html', {
-        'usuarios': usuarios,
+        'usuarios': lista_usuarios,
         'form_crear': form_crear
     })
 
@@ -109,7 +148,6 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def dashboard_view(request):
-    # Asegúrate de que el nombre aquí sea EXACTAMENTE el mismo de tu archivo nuevo
     return render(request, 'usuarios/dashboard_admin.html')
 
 
@@ -151,6 +189,8 @@ def marcar_asistencia(request):
             return JsonResponse({'status': 'success', 'title': '¡Buen trabajo!', 'msg': 'Salida registrada correctamente.'})
             
     return JsonResponse({'status': 'error', 'title': 'Error', 'msg': 'Método no permitido.'}, status=405)
+
+
 @login_required(login_url='login')
 def eliminar_usuario(request, user_id):
     if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
