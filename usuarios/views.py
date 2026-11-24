@@ -151,3 +151,15 @@ def marcar_asistencia(request):
             return JsonResponse({'status': 'success', 'title': '¡Buen trabajo!', 'msg': 'Salida registrada correctamente.'})
             
     return JsonResponse({'status': 'error', 'title': 'Error', 'msg': 'Método no permitido.'}, status=405)
+@login_required(login_url='login')
+def eliminar_usuario(request, user_id):
+    if request.user.is_superuser or request.user.groups.filter(name='Admin').exists():
+        usuario = get_object_or_404(User, id=user_id)
+        if usuario != request.user:
+            usuario.delete()
+            messages.success(request, f'Usuario {usuario.username} eliminado correctamente.')
+        else:
+            messages.error(request, 'No puedes eliminar tu propio usuario activo.')
+    else:
+        messages.error(request, 'No tienes permisos para realizar esta acción.')
+    return redirect('mantenedor_usuarios')
