@@ -24,5 +24,7 @@ urlpatterns = [
     path('catalogo/', views.catalogo_productos, name='catalogo'),
     path('mantenedor-productos/', views.mantenedor_productos, name='mantenedor_productos'),
     path('editar-producto/<int:id>/', views.editar_producto, name='editar_producto'),
-    path('eliminar-producto/<int:id>/', views.eliminar_producto, name='eliminar_producto'),
+    path('eliminar-producto/<int:id>/', views.eliminar_producto, name='eliminar_producto')
+    path('recuperar-password/', views.recuperar_password, name='recuperar_password'),
+    path('cambiar-password/', views.cambiar_password, name='cambiar_password'),,
 ]

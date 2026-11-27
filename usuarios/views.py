@@ -46,8 +46,8 @@ def editar_usuario(request, user_id):
         form = EditarUsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
             nuevo_sueldo = form.cleaned_data.get('sueldo_base')
-            if nuevo_sueldo is not None and nuevo_sueldo < 0:
-                messages.error(request, 'El sueldo base no puede ser negativo.')
+            if nuevo_sueldo is None or nuevo_sueldo <= 0:
+                messages.error(request, 'El sueldo base debe ser mayor a $0.')
                 return render(request, 'usuarios/editar_usuario.html', {'form': form, 'usuario': usuario})
 
             user = form.save()
@@ -59,8 +59,7 @@ def editar_usuario(request, user_id):
                 user.groups.add(grupo)
                 
             # 2. Guardar Sueldo en el Perfil
-            if nuevo_sueldo is not None:
-                _asignar_sueldo(perfil, nuevo_sueldo)
+            _asignar_sueldo(perfil, nuevo_sueldo)
             
             messages.success(request, f'Usuario {user.username} actualizado correctamente.')
             return redirect('mantenedor_usuarios')
@@ -74,14 +73,14 @@ def editar_usuario(request, user_id):
     return render(request, 'usuarios/editar_usuario.html', {'form': form, 'usuario': usuario})
 
 
-@login_required
+@login_required(login_url='login')
 def mantenedor_usuarios(request):
     if request.method == 'POST':
         form_crear = CrearUsuarioForm(request.POST)
         if form_crear.is_valid():
             sueldo = form_crear.cleaned_data.get('sueldo') or 0
-            if sueldo < 0:
-                messages.error(request, 'El sueldo base no puede ser negativo.')
+            if sueldo <= 0:
+                messages.error(request, 'El sueldo base debe ser mayor a $0.')
             else:
                 username = form_crear.cleaned_data['username']
                 email = form_crear.cleaned_data['email']
